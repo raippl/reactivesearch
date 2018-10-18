@@ -14,14 +14,15 @@ import {
 class ESSearch extends Component {
   render() {
     return (
-      <ReactiveBase app="operetest" url="http://locale:9200/" type="doc">
+      <ReactiveBase app="operetest" url="http://elk-master-1.teamdigitale.test:9200/" type="doc">
       	<div style={{ display: "flex", flexDirection: "row" }}>
 			<div style={{ display: "flex", flexDirection: "column", width: "30%" , paddingRight: "60px"}}>
                 <DataSearch
                 componentId="searchbox"
-                dataField={["descrizione", "forma_giuridica","scelta_contraente"]}
+                dataField={["descrizione","forma_giuridica","scelta_contraente"]}
                 placeholder="Cerca"
                 title="Cerca Documento"
+                highlight
                 style={{paddingBottom: '50px'}}
                 react={{
                     and: ["searchbox", "importofilter", "regionefilter", "provinciafilter", "comunefilter" ]
@@ -35,18 +36,18 @@ class ESSearch extends Component {
                         style={{paddingBottom: '50px'}}
                         defaultSelected={(min, max) => (
                             {
-                            "start": min,
+                            "start": min?min:0,
                             "end": max
                             }
-                        )}
+                        )} 
                         rangeLabels={(min, max) => (
                             {
-                                "start": "$ "+ min ,
+                                "start": "$ "+ min?min:0,
                                 "end": "$ "+ max
                             }
                         )}
                         react={{
-                            and: ["searchbox", "importofilter", "regionefilter", "provinciafilter", "comunefilter" ]
+                            and: ["searchbox", "regionefilter", "provinciafilter", "comunefilter" ]
                         }}
                     /> 
                 <MultiList
@@ -96,14 +97,14 @@ class ESSearch extends Component {
                         title: res.codice_unico_progetto,
                         description: (
                             <div>
-                                <p style={{fontStyle: 'italic'}}>{res.descrizione}</p>
+                                <p style={{fontStyle: 'italic'}} dangerouslySetInnerHTML={{__html: res.descrizione}}></p>
                                 <div className="price">${res.importo}</div>
                                 <p><b>Regione: </b>{res.regione_progetto}  <b>Provincia: </b>{res.provincia_progetto}  <b>Comune: </b>{res.comune_progetto}</p>
                                 <p><b>Forma Giuridica: </b>{res.forma_giuridica}</p>
                                 <p><b>Scelta Contraente: </b>{res.scelta_contraente}</p>
-                                {res.entita && res.entita.length >0 && res.entita.map((ent) => {
+                                {res.entita && res.entita.length >0 && res.entita.map((index, ent) => {
                                     return(
-                                            <span className="badge badge-primary ml-1">{ent}</span>
+                                            <span key={index} className="badge badge-primary ml-1">{ent}</span>
                                             )
                                         }
                                     )

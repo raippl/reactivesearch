@@ -23,7 +23,7 @@ class App extends Component {
                                 <h2 className="mr-4 mb-0"><b>Italia</b></h2></a>
                                 <span className="badge badge-pill mt-2 h-100" style={{backgroundColor: 'rgba(0, 0, 0, 0.2)', 'height': 'max-content'}}>versione alpha 1.0</span>
                             </div>
-                            <p className="d-sm-down-none">Data &amp; Analytics Framework<b>Italia</b></p>
+                            <p className="d-sm-down-none">Data &amp; Analytics Framework<b> Italia</b></p>
                         </div>
                     </div>
                 </div>
