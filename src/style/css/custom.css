@@ -570,7 +570,7 @@
 }
 
 .main-header {
-    height: 124px;
+    height: 100px;
     background-color: var(--primary);
     color: #FFFFFF;
     position: relative; 
@@ -587,7 +587,7 @@
   transition: height 0.5s ease, line-height 0.5s ease, top 0.5s ease, left 0.5s ease, right 0.5s ease, bottom 0.5s ease, padding 0.5s ease, background-size 0.5s ease, width 0.5s ease, border 0.5s ease, margin 0.5s ease; }
 
 .header-fixed .app-body.pub{
-    margin-top: 220px;
+    margin-top: 130px;
 }
 
 .header-fixed .app-body.pub .js-scrolled {
