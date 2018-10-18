@@ -1,0 +1,35 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: reactivesearch
+  labels:
+    app: reactivesearch
+spec:
+  ports:
+  - port: 5000
+  selector:
+    app: reactivesearch
+---
+apiVersion: apps/v1beta1
+kind: Deployment
+metadata:
+  name: reactivesearch-deployment
+spec:
+  replicas: 1
+  strategy:
+      type: Recreate
+  template:
+    metadata:
+      labels:
+        app: reactivesearch
+    spec:
+      containers:
+      - name: reactivesearch
+        image: nexus.teamdigitale.test/reactivesearch:1.0.0
+        imagePullPolicy: Always
+        ports:
+        - name: client
+          containerPort: 5000
+        securityContext:
+          privileged: true
+          runAsUser: 0
