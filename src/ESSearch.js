@@ -1,120 +1,173 @@
 import React, { Component } from "react";
 import {
   ReactiveBase,
-  CategorySearch,
-  SingleRange,
-  RangeSlider,
   ResultList,
   DataSearch,
-  DynamicRangeSlider,
-  MultiList
+  RangeSlider,
+  MultiList,
+  SelectedFilters
 } from "@appbaseio/reactivesearch";
-
 
 class ESSearch extends Component {
   render() {
     return (
-      <ReactiveBase app="operetest" url="http://elk-master-1.teamdigitale.test:9200/" type="doc">
-      	<div style={{ display: "flex", flexDirection: "row" }}>
-			<div style={{ display: "flex", flexDirection: "column", width: "30%" , paddingRight: "60px"}}>
-                <DataSearch
-                componentId="searchbox"
-                dataField={["descrizione","forma_giuridica","scelta_contraente"]}
-                placeholder="Cerca"
-                title="Cerca Documento"
-                highlight
-                style={{paddingBottom: '50px'}}
-                react={{
-                    and: ["searchbox", "importofilter", "regionefilter", "provinciafilter", "comunefilter" ]
-                }}
-                />
-                <DynamicRangeSlider
-                        componentId="importofilter"
-                        dataField="importo"
-                        title="Importo"
-                        showHistogram = {true}
-                        style={{paddingBottom: '50px'}}
-                        defaultSelected={(min, max) => (
-                            {
-                            "start": min?min:0,
-                            "end": max
+      <ReactiveBase
+        url="http://elk-master-1.teamdigitale.test:9200/"
+        app="operetest"
+        type="doc"
+      >
+        <div style={{ display: "flex", flexDirection: "row" }}>
+          <div
+            style={{
+              display: "flex",
+              flexDirection: "column",
+              width: "30%",
+              paddingRight: "60px"
+            }}
+          >
+            <DataSearch
+              title="Cerca Documento"
+              placeholder="Cerca"
+              style={{ paddingBottom: "50px" }}
+              componentId="Ricerca"
+              dataField={[
+                "descrizione",
+                "forma_giuridica",
+                "scelta_contraente"
+              ]}
+              react={{
+                and: ["Importo", "Regione", "Provincia", "Comune"]
+              }}
+              queryFormat="and"
+              highlight
+            />
+            <RangeSlider
+              title="Importo"
+              style={{ paddingBottom: "50px" }}
+              rangeLabels={{
+                start: "$0",
+                end: "$32000"
+              }}
+              range={{ start: 0, end: 32000 }}
+              showHistogram={true}
+              componentId="Importo"
+              dataField="importo"
+              react={{
+                and: ["Ricerca", "Regione", "Provincia", "Comune"]
+              }}
+              customQuery={(value, props) => ({
+                "bool": {
+                  "should": [
+                    {
+                      "bool": {
+                        "must_not": [
+                          {
+                            "exists": {
+                              "field": "importo"
                             }
-                        )} 
-                        rangeLabels={(min, max) => (
-                            {
-                                "start": "$ "+ min?min:0,
-                                "end": "$ "+ max
-                            }
-                        )}
-                        react={{
-                            and: ["searchbox", "regionefilter", "provinciafilter", "comunefilter" ]
-                        }}
-                    /> 
-                <MultiList
-                    componentId="regionefilter"
-                    dataField="regione_progetto"
-                    title="Regione"
-                    style={{paddingBottom: '50px'}}
-                    react={{
-                        and: ["searchbox", "importofilter", "regionefilter", "provinciafilter", "comunefilter" ]
-                    }}
-                />
-                <MultiList
-                    componentId="provinciafilter"
-                    dataField="provincia_progetto"
-                    title="Provincia"
-                    style={{paddingBottom: '50px'}}
-                    react={{
-                        and: ["searchbox", "importofilter", "regionefilter", "provinciafilter", "comunefilter" ]
-                    }}
-                />
-                <MultiList
-                    componentId="comunefilter"
-                    dataField="comune_progetto"
-                    title="Comune"
-                    style={{paddingBottom: '50px'}}
-                    react={{
-                        and: ["searchbox", "importofilter", "regionefilter", "provinciafilter", "comunefilter" ]
-                    }}
-                />
-         
-            </div>
-            <div style={{ display: "flex", flexDirection: "column", width: "70%" }}>
-                <ResultList
-                    componentId="results"
-                    title="Risultati"
-                    dataField="descrizione"
-                    from={0}
-                    size={8}
-                    pagination={true}
-                    style={{"marginBottom": "10px"}}
-
-                    react={{
-                        and: ["searchbox", "importofilter", "regionefilter", "provinciafilter", "comunefilter" ]
-                    }}
-                    onData={res => {
-                        return {
-                        title: res.codice_unico_progetto,
-                        description: (
-                            <div>
-                                <p style={{fontStyle: 'italic'}} dangerouslySetInnerHTML={{__html: res.descrizione}}></p>
-                                <div className="price">${res.importo}</div>
-                                <p><b>Regione: </b>{res.regione_progetto}  <b>Provincia: </b>{res.provincia_progetto}  <b>Comune: </b>{res.comune_progetto}</p>
-                                <p><b>Forma Giuridica: </b>{res.forma_giuridica}</p>
-                                <p><b>Scelta Contraente: </b>{res.scelta_contraente}</p>
-                                {res.entita && res.entita.length >0 && res.entita.map((index, ent) => {
-                                    return(
-                                            <span key={index} className="badge badge-primary ml-1">{ent}</span>
-                                            )
-                                        }
-                                    )
-                                }
-                            </div>
-                        ),
-                        };
-                    }}
-                /> 
-            </div>
+                          }
+                        ]
+                      }
+                    },
+                    {
+                      "range": {
+                        "importo": {
+                          "gte": value[0],
+                          "lte": value[1],
+                          "boost": 2
+                        }
+                      }
+                    }
+                  ]
+                }
+              })}
+            />
+            <MultiList
+              title="Regione"
+              style={{ paddingBottom: "50px" }}
+              showCheckbox
+              componentId="Regione"
+              dataField="regione_progetto"
+              react={{
+                and: ["Ricerca", "Importo", "Regione", "Provincia", "Comune"]
+              }}
+            />
+            <MultiList
+              title="Provincia"
+              style={{ paddingBottom: "50px" }}
+              showCheckbox
+              componentId="Provincia"
+              dataField="provincia_progetto"
+              react={{
+                and: ["Ricerca", "Importo", "Regione", "Provincia", "Comune"]
+              }}
+            />
+            <MultiList
+              title="Comune"
+              style={{ paddingBottom: "50px" }}
+              showCheckbox
+              componentId="Comune"
+              dataField="comune_progetto"
+              react={{
+                and: ["Ricerca", "Importo", "Regione", "Provincia", "Comune"]
+              }}
+            />
+          </div>
+          <div
+            style={{ display: "flex", flexDirection: "column", width: "70%" }}
+          >
+            <SelectedFilters />
+            <ResultList
+              style={{ marginBottom: "10px" }}
+              size={8}
+              pagination={true}
+              componentId="Risultati"
+              dataField="descrizione"
+              react={{
+                and: ["Ricerca", "Importo", "Regione", "Provincia", "Comune"]
+              }}
+              onData={res => {
+                return {
+                  title: res.codice_unico_progetto,
+                  description: (
+                    <div>
+                      <p
+                        style={{ fontStyle: "italic" }}
+                        dangerouslySetInnerHTML={{ __html: res.descrizione }}
+                      />
+                      <div className="price">${res.importo}</div>
+                      <p>
+                        <b>Regione: </b>
+                        {res.regione_progetto} <b>Provincia: </b>
+                        {res.provincia_progetto} <b>Comune: </b>
+                        {res.comune_progetto}
+                      </p>
+                      <p>
+                        <b>Forma Giuridica: </b>
+                        {res.forma_giuridica}
+                      </p>
+                      <p>
+                        <b>Scelta Contraente: </b>
+                        {res.scelta_contraente}
+                      </p>
+                      {res.entita &&
+                        res.entita.length > 0 &&
+                        res.entita.map((index, ent) => {
+                          return (
+                            <span
+                              key={index}
+                              className="badge badge-primary ml-1"
+                            >
+                              {ent}
+                            </span>
+                          );
+                        })}
+                    </div>
+                  )
+                };
+              }}
+            />
+          </div>
         </div>
       </ReactiveBase>
     );
